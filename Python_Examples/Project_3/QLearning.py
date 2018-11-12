@@ -50,9 +50,10 @@ class TabQAgent(object):
     def updateQTable(self, reward, current_state, prev_state, prev_a):
 
         # Keeping a running average of all previously observed samples
-		self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (reward + (self.gamma * max(self.q_table[current_state][0], self.q_table[current_state][1], self.q_table[current_state][2], self.q_table[current_state][3])))
+        self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (reward + (self.gamma * max(self.q_table[current_state][0], self.q_table[current_state][1], self.q_table[current_state][2], self.q_table[current_state][3])))
 
         return
+
     ### Change q_table to reflect what we have learnt upon reaching the terminal state.
     # Input: reward - int, prev_state - coordinate tuple, prev_a - int
     # Output: updated q_table
@@ -61,6 +62,7 @@ class TabQAgent(object):
         self.q_table[prev_state][prev_a] = reward
 
         return
+
     def act(self, world_state, agent_host, current_r):
         obs_text = world_state.observations[-1].text
         obs = json.loads(obs_text)  # most recent observation
@@ -80,7 +82,7 @@ class TabQAgent(object):
         self.drawQ(curr_x=int(obs[u'XPos']), curr_y=int(obs[u'ZPos']))
 
         # select the next action (find a s.t. self.actions[a] == next action)
-		if random.random() <= self.epsilon:
+        if random.random() <= self.epsilon:
             next_action = random.choice([0,1,2,3])
         else:
             print(self.q_table[current_s])
@@ -95,7 +97,7 @@ class TabQAgent(object):
             print(self.actions[next_action])
 
         # try to send the selected action to agent, only update prev_s if this succeeds
-		agent_host.sendCommand(self.actions[next_action])
+        agent_host.sendCommand(self.actions[next_action])
         self.prev_s = current_s
         self.prev_a = next_action
 
