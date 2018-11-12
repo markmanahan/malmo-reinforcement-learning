@@ -50,7 +50,7 @@ class TabQAgent(object):
     def updateQTable(self, reward, current_state, prev_state, prev_a):
 
         # Keeping a running average of all previously observed samples
-        self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (reward + (self.gamma * self.q_table[current_state]))
+		self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (reward + (self.gamma * max(self.q_table[current_state][0], self.q_table[current_state][1], self.q_table[current_state][2], self.q_table[current_state][3])))
 
         return
     ### Change q_table to reflect what we have learnt upon reaching the terminal state.
@@ -80,19 +80,24 @@ class TabQAgent(object):
         self.drawQ(curr_x=int(obs[u'XPos']), curr_y=int(obs[u'ZPos']))
 
         # select the next action (find a s.t. self.actions[a] == next action)
-
-                    ### YOUR CODE HERE ###
-                    ### YOUR CODE HERE ###
-                    ### YOUR CODE HERE ###
-
+		if random.random() <= self.epsilon:
+            next_action = random.choice([0,1,2,3])
+        else:
+            print(self.q_table[current_s])
+            maxExp = max(self.q_table[current_s])
+            print("max is ",maxExp)
+            bestResults = []
+            for i in range(4):
+                if self.q_table[current_s][i] == maxExp:
+                    bestResults.append(i)
+            next_action = random.choice(bestResults)
+            print(next_action)
+            print(self.actions[next_action])
 
         # try to send the selected action to agent, only update prev_s if this succeeds
-
-                    ### YOUR CODE HERE ###
-                    ### YOUR CODE HERE ###
-                    ### YOUR CODE HERE ###
-
-
+		agent_host.sendCommand(self.actions[next_action])
+        self.prev_s = current_s
+        self.prev_a = next_action
 
         return current_r
 
