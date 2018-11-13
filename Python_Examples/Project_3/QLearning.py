@@ -1,5 +1,5 @@
-# Ben Hughes (bch3jh)
-# Mark Manahan (mmm5ja)
+# Ben Hughes
+# Mark Manahan
 
 from __future__ import print_function
 
@@ -16,6 +16,8 @@ import random
 import sys
 import time
 
+# from numpy import argmax
+
 if sys.version_info[0] == 2:
     import Tkinter as tk
 else:
@@ -28,7 +30,7 @@ class TabQAgent(object):
     def __init__(self):
 
         self.epsilon = 0.05  # exploration rate
-        self.alpha = 0.2     # learning rate
+        self.alpha = 0.2  # learning rate
         self.gamma = 0.8  # reward discount factor
 
         self.logger = logging.getLogger(__name__)
@@ -43,14 +45,15 @@ class TabQAgent(object):
         self.q_table = {}
         self.canvas = None
         self.root = None
-        
+
     ### Change q_table to reflect what we have learnt.
     # Inputs: reward - int, current_state - coordinate tuple, prev_state - coordinate tuple, prev_a - int
     # Output: updated q_table
     def updateQTable(self, reward, current_state, prev_state, prev_a):
-
         # Keeping a running average of all previously observed samples
-        self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (reward + (self.gamma * max(self.q_table[current_state][0], self.q_table[current_state][1], self.q_table[current_state][2], self.q_table[current_state][3])))
+        self.q_table[prev_state][prev_a] = (1 - self.alpha) * self.q_table[prev_state][prev_a] + self.alpha * (
+                    reward + (self.gamma * max(self.q_table[current_state][0], self.q_table[current_state][1],
+                                               self.q_table[current_state][2], self.q_table[current_state][3])))
 
         return
 
@@ -58,9 +61,7 @@ class TabQAgent(object):
     # Input: reward - int, prev_state - coordinate tuple, prev_a - int
     # Output: updated q_table
     def updateQTableFromTerminatingState(self, reward, prev_state, prev_a):
-
         self.q_table[prev_state][prev_a] = reward
-
         return
 
     def act(self, world_state, agent_host, current_r):
@@ -83,18 +84,14 @@ class TabQAgent(object):
 
         # select the next action (find a s.t. self.actions[a] == next action)
         if random.random() <= self.epsilon:
-            next_action = random.choice([0,1,2,3])
+            next_action = random.choice([0, 1, 2, 3])
         else:
-            print(self.q_table[current_s])
             maxExp = max(self.q_table[current_s])
-            print("max is ",maxExp)
             bestResults = []
             for i in range(4):
                 if self.q_table[current_s][i] == maxExp:
                     bestResults.append(i)
             next_action = random.choice(bestResults)
-            print(next_action)
-            print(self.actions[next_action])
 
         # try to send the selected action to agent, only update prev_s if this succeeds
         agent_host.sendCommand(self.actions[next_action])
@@ -129,7 +126,7 @@ class TabQAgent(object):
                     for reward in world_state.rewards:
                         current_r += reward.getValue()
                     if world_state.is_mission_running and len(world_state.observations) > 0 and not \
-                    world_state.observations[-1].text == "{}":
+                            world_state.observations[-1].text == "{}":
                         total_reward += self.act(world_state, agent_host, current_r)
                         break
                     if not world_state.is_mission_running:
@@ -153,12 +150,11 @@ class TabQAgent(object):
                     for reward in world_state.rewards:
                         current_r += reward.getValue()
                     if world_state.is_mission_running and len(world_state.observations) > 0 and not \
-                    world_state.observations[-1].text == "{}":
+                            world_state.observations[-1].text == "{}":
                         total_reward += self.act(world_state, agent_host, current_r)
                         break
                     if not world_state.is_mission_running:
                         break
-
 
         # process final reward
         total_reward += current_r
